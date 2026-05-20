@@ -11,8 +11,18 @@ usage() {
   echo "git wt run <git-args...>"
 }
 
-# Name of the bare directory (kept as .bare here).
 BARE_NAME="${GIT_WT_BARE_DIR:-.bare}"
+DEFAULT_BRANCH_FILE=".git-wt-default-branch"
+
+# Utility: get default branch (from file or detect)
+get_default_branch() {
+  if [ -f "$DEFAULT_BRANCH_FILE" ]; then
+    cat "$DEFAULT_BRANCH_FILE"
+  else
+    # Try to detect from origin/HEAD
+    git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@'
+  fi
+}
 
 # ---------- INIT ----------
 cmd_init() {
@@ -24,20 +34,23 @@ cmd_init() {
   mkdir -p "$REPO_NAME"
   cd "$REPO_NAME"
 
-  # clone into the configured bare dir name if it doesn't exist
   if [ ! -d "$BARE_NAME" ]; then
     git clone --bare "$REPO_URL" "$BARE_NAME"
   fi
 
-  # create a .git file that points to the bare repo (so standard `git` in
-  # this working tree talks to the bare repo)
   echo "gitdir: ./$BARE_NAME" > .git
 
+  echo "AGENTS.md" >> $BARE_NAME/info/exclude
+  echo ".github/copilot-instructions.md" >> $BARE_NAME/info/exclude
+
   git config --replace-all remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
-  # now run git commands from repo root (they will follow the .git pointer)
   git fetch origin --prune
 
-  [ -d main ] || git worktree add main main
+  # Detect and save default branch
+  DEFAULT_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD | sed 's@^refs/remotes/origin/@@')
+  echo "$DEFAULT_BRANCH" > "$DEFAULT_BRANCH_FILE"
+
+  [ -d "$DEFAULT_BRANCH" ] || git worktree add "$DEFAULT_BRANCH" "$DEFAULT_BRANCH"
 
   if git show-ref --verify --quiet refs/remotes/origin/stage; then
     [ -d stage ] || git worktree add stage stage
@@ -53,7 +66,7 @@ cmd_init() {
   echo "Structure:"
   echo "  $REPO_NAME/"
   echo "    ├── $BARE_NAME/"
-  echo "    ├── main/"
+  echo "    ├── $DEFAULT_BRANCH/"
   echo "    └── stage/"
   echo "    └── review/"
   echo
@@ -65,34 +78,50 @@ cmd_add() {
 
     BRANCH="${1:-}"
     FOLDER="${2:-}"
-    BASE="${3:-main}"
+    BASE="${3:-}"
+
+    DEFAULT_BRANCH=$(get_default_branch)
+    [ -n "$BASE" ] || BASE="$DEFAULT_BRANCH"
 
     [ -n "$BRANCH" ] || { echo "❌ branch required"; exit 1; }
-    [ -d "$BRANCH" ] && { echo "❌ folder already exists"; exit 1; }
-
-    # default folder name = branch name
     [ -n "$FOLDER" ] || FOLDER="$BRANCH"
+    [ -d "$FOLDER" ] && { echo "❌ folder already exists"; exit 1; }
 
-    # does branch exist (local or remote)?
-    if git show-ref --verify --quiet "refs/remotes/origin/$BRANCH"; then
-        echo "▶ Using existing remote branch: origin/$BRANCH"
-        git worktree add "$FOLDER" --track "origin/$BRANCH"
-
-    elif git show-ref --verify --quiet "refs/heads/$BRANCH"; then
+    if git show-ref --verify --quiet "refs/heads/$BRANCH"; then
         echo "▶ Using existing local branch: $BRANCH"
         git worktree add "$FOLDER" "$BRANCH"
-
+        if ! git -C "$FOLDER" rev-parse --abbrev-ref --symbolic-full-name @{u} >/dev/null 2>&1; then
+            if git show-ref --verify --quiet "refs/remotes/origin/$BRANCH"; then
+                git -C "$FOLDER" branch --set-upstream-to="origin/$BRANCH"
+            fi
+        fi
+    elif git show-ref --verify --quiet "refs/remotes/origin/$BRANCH"; then
+        echo "▶ Using existing remote branch: origin/$BRANCH"
+        git worktree add -b "$BRANCH" "$FOLDER" "origin/$BRANCH"
     else
         echo "▶ Creating new branch: $BRANCH from $BASE"
-
-        # base must exist (local or remote)
         if ! git show-ref --verify --quiet "refs/heads/$BASE" &&
             ! git show-ref --verify --quiet "refs/remotes/origin/$BASE"; then
           echo "❌ base branch does not exist: $BASE"
           exit 1
         fi
-
         git worktree add -b "$BRANCH" "$FOLDER" "$BASE"
+        if git show-ref --verify --quiet "refs/remotes/origin/$BASE"; then
+            git -C "$FOLDER" branch --set-upstream-to="origin/$BASE"
+        fi
+    fi
+
+    MAIN_BRANCH="$DEFAULT_BRANCH"
+    MAIN_BRANCH_ABS="$(cd "$MAIN_BRANCH" && pwd)"
+    FOLDER_ABS="$(cd "$FOLDER" && pwd)"
+
+    if [ -f "${MAIN_BRANCH_ABS}/AGENTS.md" ]; then
+        ln -sf "${MAIN_BRANCH_ABS}/AGENTS.md" "${FOLDER_ABS}/AGENTS.md" 2>/dev/null || cp "${MAIN_BRANCH_ABS}/AGENTS.md" "${FOLDER_ABS}/AGENTS.md"
+    fi
+
+    if [ -f "${MAIN_BRANCH_ABS}/.github/copilot-instructions.md" ]; then
+        mkdir -p "${FOLDER_ABS}/.github"
+        ln -sf "${MAIN_BRANCH_ABS}/.github/copilot-instructions.md" "${FOLDER_ABS}/.github/copilot-instructions.md" 2>/dev/null || cp "${MAIN_BRANCH_ABS}/.github/copilot-instructions.md" "${FOLDER_ABS}/.github/copilot-instructions.md"
     fi
 }
 
@@ -111,7 +140,6 @@ cmd_run() {
     git "$@"
 }
 
-# ---------- DISPATCH ----------
 case "$SUBCMD" in
   init)   cmd_init "$@" ;;
   add)    cmd_add "$@" ;;
