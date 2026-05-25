@@ -1,0 +1,65 @@
+# Cache files
+.cache/
+*.cache
+*.omp.cache
+
+# Zed editor
+.config/zed/extensions/
+.config/zed/logs/
+
+# Oh-my-posh
+.config/oh-my-posh/*.cache
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*.swo
+*~
+
+# Linux
+.directory
+.Trash-*
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-workspace
+
+# OS generated files
+Thumbs.db
+
+# Local development
+.env
+.env.local
+secrets/
+private/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Ruby
+.bundle/
+*.gem
+
+# Build artifacts
+dist/
+build/
+*.o
+*.a
