@@ -1,8 +1,8 @@
-# 🔧 Dotfiles
+# Dotfiles
 
 My personal dotfiles configuration for zsh, oh-my-posh, zed, and other tools.
 
-## 📁 Structure
+## Structure
 
 ```
 dotfiles/
@@ -17,7 +17,7 @@ dotfiles/
 └── README.md           # This file
 ```
 
-## ⚡ Quick Start
+## Quick Start
 
 ### Clone the repo
 ```bash
@@ -36,7 +36,7 @@ chmod +x install.sh
 exec zsh
 ```
 
-## 🔄 What Gets Installed
+## What Gets Installed
 
 The `install.sh` script creates symlinks for:
 
@@ -46,7 +46,7 @@ The `install.sh` script creates symlinks for:
 - **zsh environment** → `~/.zshenv`
 - **bin scripts** → `~/.local/bin/`
 
-## 📝 Customizing
+## Customizing
 
 ### Add new configurations
 
@@ -66,7 +66,7 @@ The `install.sh` script creates symlinks for:
 
 Just edit files in the repo and run `install.sh` again (safe to re-run).
 
-## 🚫 Excluded Files
+## Excluded Files
 
 These files are NOT stored (and should be in `.gitignore`):
 
@@ -76,13 +76,13 @@ These files are NOT stored (and should be in `.gitignore`):
 - `.DS_Store` - macOS files
 - Zed extensions and logs
 
-## 🛠 Requirements
+## Requirements
 
 - zsh shell
 - oh-my-posh (optional)
 - zed editor (optional)
 
-## 📖 XDG Base Directory
+## XDG Base Directory
 
 This repo follows the [XDG Base Directory](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html) standard:
 
@@ -90,12 +90,12 @@ This repo follows the [XDG Base Directory](https://specifications.freedesktop.or
 - `$XDG_DATA_HOME` → `~/.local/share`
 - `$XDG_CACHE_HOME` → `~/.cache`
 
-## 🔗 Useful Links
+## Useful Links
 
 - [Oh-my-posh Docs](https://ohmyposh.dev)
 - [Zed Editor](https://zed.dev)
 - [XDG Base Directory Spec](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
 
-## 📄 License
+## License
 
 Feel free to use and modify as needed!
