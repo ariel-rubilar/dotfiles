@@ -6,7 +6,7 @@ fi
 
 source "${ZINIT_HOME}/zinit.zsh"
 
-eval "$(oh-my-posh init zsh --config ${XDG_CACHE_HOME}/oh-my-posh/themes/custom.omp.json)"
+eval "$(oh-my-posh init zsh --config ${XDG_CONFIG_HOME}/oh-my-posh/themes/custom.omp.json)"
 
 # add zinit plugins
 zinit light zsh-users/zsh-autosuggestions
