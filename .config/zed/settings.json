@@ -1,0 +1,57 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+//
+{
+  "cli_default_open_behavior": "new_window",
+  "project_panel": {
+    "dock": "left",
+  },
+  "outline_panel": {
+    "dock": "left",
+  },
+  "collaboration_panel": {
+    "dock": "left",
+  },
+  "git_panel": {
+    "dock": "left",
+  },
+  "ui_font_family": "JetBrainsMono Nerd Font Mono",
+  "buffer_font_family": "JetBrainsMono Nerd Font Mono",
+  "edit_predictions": {
+    "mode": "subtle",
+    "provider": "copilot",
+  },
+  "agent_servers": {
+    "github-copilot-cli": {
+      "type": "registry",
+    },
+    "github-copilot": {
+      "type": "registry",
+    },
+  },
+  "agent": {
+    "sidebar_side": "right",
+    "dock": "right",
+    "inline_assistant_model": {
+      "provider": "copilot_chat",
+      "model": "oswe-vscode-prime",
+    },
+    "default_profile": "write",
+    "default_model": {
+      "enable_thinking": true,
+      "provider": "copilot_chat",
+      "model": "claude-haiku-4.5",
+    },
+    "model_parameters": [],
+  },
+  "icon_theme": "Zed (Default)",
+  "ui_font_size": 16,
+  "buffer_font_size": 15,
+  "theme": "Catppuccin Frappé",
+}
