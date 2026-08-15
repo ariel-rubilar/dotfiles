@@ -18,6 +18,11 @@ export NVM_DIR="$HOME/.nvm"
 
 
 # Clean up
-
 export VIMINIT='let $MYVIMRC="$XDG_CONFIG_HOME/vim/vimrc" | source $MYVIMRC'
 export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME/npm/npmrc"
+export COPILOT_HOME="$XDG_CONFIG_HOME"/copilot
+export GOPATH="$XDG_DATA_HOME/go"
+export GOMODCACHE="$XDG_CACHE_HOME/go/mod"
+
+
+export MANPAGER="vim -M +MANPAGER -"
